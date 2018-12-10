@@ -1,0 +1,31 @@
+{
+  "name": "notary-service",
+  "version": "1.0.0",
+  "description": "A simple private blockchain notary service",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/axelgalicia/private-blockchain-notary-service.git"
+  },
+  "author": "Axel Galicia",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/axelgalicia/private-blockchain-notary-service/issues"
+  },
+  "homepage": "https://github.com/axelgalicia/private-blockchain-notary-service#readme",
+  "dependencies": {
+    "bitcoinjs-lib": "^4.0.2",
+    "bitcoinjs-message": "^2.0.0",
+    "body-parser": "^1.18.3",
+    "colors": "^1.3.2",
+    "crypto-js": "^3.1.9-1",
+    "express": "^4.16.4",
+    "hex2ascii": "0.0.3",
+    "level": "^4.0.0",
+    "morgan": "^1.9.1",
+    "uuid": "^3.3.2"
+  }
+}

@@ -12,6 +12,9 @@ const bodyParser = require("body-parser");
 //Logger
 const morgan = require('morgan');
 
+//Controllers
+let ValidationController = require('./controllers/ValidationController');
+
 /**
  * Class Definition for the REST API
  */
@@ -49,6 +52,7 @@ class BlockAPI {
      */
 	initControllers() {
 		require("./controllers/BlockController.js")(this.app);
+		new ValidationController(this.app);
 	}
 
     /**

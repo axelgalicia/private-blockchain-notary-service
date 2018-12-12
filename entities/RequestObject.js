@@ -3,11 +3,10 @@
 |==========================================*/
 
 class RequestObject {
-    constructor(walletAddress, requestTimeStamp, message, validationWindow) {
+    constructor(walletAddress, requestTimeStamp) {
         this.walletAddress = walletAddress;
         this.requestTimeStamp = requestTimeStamp;
-        this.message = message;
-        this.validationWindow = validationWindow;
+        this.message = `${walletAddress}:${requestTimeStamp}:starRegistry`;
     }
 }
 module.exports = RequestObject;

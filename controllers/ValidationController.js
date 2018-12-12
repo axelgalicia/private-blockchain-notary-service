@@ -24,9 +24,8 @@ class ValidationController {
     requestValidation() {
         this.app.post('/requestValidation', (req, res) => {
             const { address } = req.body;
-            console.log(address);
-            this.memPool.addRequestToPool({ walletAddress: address });
-            res.send(new RequestObject(address, 1234, 'hello', 300));
+            const requestObject = this.memPool.addRequestValidation({ walletAddress: address });
+            res.send(requestObject);
         });
     }
 

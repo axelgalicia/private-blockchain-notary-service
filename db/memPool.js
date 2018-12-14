@@ -11,11 +11,19 @@ class MemPool {
         this.mempoolValid = [];
         this.memPool = [];
         this.timeoutRequests = [];
+        this.timeoutValidRequests = [];
     }
 
-    setTimeout(walletAddress) {
+    // Adds the timeout for temporal mempool requests
+    setTimeoutTemporalPool(walletAddress) {
         this.timeoutRequests[walletAddress] =
             setTimeout(() => { this.removeValidationRequest(walletAddress) }, MemPool.TimeoutRequestsWindowTime);
+    }
+
+    // Adds the timeout for valid mempool requests
+    setTimeoutValidPool(walletAddress) {
+        this.timeoutValidRequests[walletAddress] =
+            setTimeout(() => { this.removeValidationRequest(walletAddress) }, MemPool.TimeoutValidRequestsWindowTime);
     }
 
     // Add the request validation
@@ -27,7 +35,7 @@ class MemPool {
             this.setValidationWindow(cachedRequest);
             return cachedRequest;
         } else {
-            this.setTimeout(walletAddress);
+            this.setTimeoutTemporalPool(walletAddress);
             const newRequest = new RequestObject(walletAddress, this.getTimeStamp());
             this.memPool[walletAddress] = newRequest;
             this.setValidationWindow(newRequest);
@@ -50,13 +58,26 @@ class MemPool {
         return timeLeft;
     }
 
-    // Remove the request from the mempool
+    // Remove the request from the temporal mempool
     removeValidationRequest(walletAddress) {
         this.timeoutRequests = this.timeoutRequests.filter(r => r.walletAddress !== walletAddress);
+    }
+
+    // Remove the request from the mempool
+    removeValidationValidRequest(walletAddress) {
+        this.timeoutValidRequests = this.timeoutValidRequests.filter(r => r.walletAddress !== walletAddress);
     }
     // Returns true if the wallet address has submitted a request before
     isRequestInPool(walletAddress) {
         if (!!this.timeoutRequests[walletAddress]) {
+            return true;
+        }
+        return false;
+    }
+
+    // Returns true if the wallet address has a valid request in the mempool
+    isValidRequestInPool(walletAddress) {
+        if (!!this.timeoutValidRequests[walletAddress]) {
             return true;
         }
         return false;
@@ -70,6 +91,15 @@ class MemPool {
         return null;
     }
 
+    // Return the exiting request from the valid mempool
+    getExistingValidRequest(address) {
+        if (this.isValidRequestInPool(address)) {
+            return this.mempoolValid[address];
+        }
+        return null;
+    }
+
+    // Validates if the signature provided correspond to the wallet address
     validateRequestByWallet(walletAddress, signature) {
         const request = this.getExistingRequest({ walletAddress: walletAddress });
         if (!request) {
@@ -88,16 +118,13 @@ class MemPool {
         const validationWindow = this.getValidationWindow(request);
         const newReq = new RequestObjectValidated(walletAddress, requestTimeStamp, message, validationWindow);
         this.removeValidationRequest(walletAddress); // Removes the request from temporal memPool
+        this.setTimeoutValidPool(walletAddress); // Adds the timeout for a valid request
         this.mempoolValid[walletAddress] = newReq; // Adds the new valid request to mempoolValid
         return newReq;
     }
 
-
-
-
-
-
 }
 
 MemPool.TimeoutRequestsWindowTime = 5 * 60 * 1000;
+MemPool.TimeoutValidRequestsWindowTime = 30 * 60 * 1000;
 module.exports = MemPool;

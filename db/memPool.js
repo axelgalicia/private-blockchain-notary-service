@@ -3,10 +3,12 @@
 ====================================*/
 
 const RequestObject = require('../entities/RequestObject');
+const RequestObjectValidated = require('../entities/RequestObjectValidated');
+const bitcoinMessage = require('bitcoinjs-message');
 
 class MemPool {
     constructor() {
-        this.memPoolValid = [];
+        this.mempoolValid = [];
         this.memPool = [];
         this.timeoutRequests = [];
     }
@@ -21,8 +23,8 @@ class MemPool {
         const { walletAddress } = request;
         const isRequestInPool = this.isRequestInPool(walletAddress);
         if (isRequestInPool) {
-             const cachedRequest = this.memPool[walletAddress];
-             this.setValidationWindow(cachedRequest); 
+            const cachedRequest = this.memPool[walletAddress];
+            this.setValidationWindow(cachedRequest);
             return cachedRequest;
         } else {
             this.setTimeout(walletAddress);
@@ -38,18 +40,21 @@ class MemPool {
     }
 
     setValidationWindow(requestObject) {
+        const timeLeft = this.getValidationWindow(requestObject);
+        requestObject.validationWindow = timeLeft;
+    }
+
+    getValidationWindow(requestObject) {
         const timeElapse = this.getTimeStamp() - requestObject.requestTimeStamp;
         const timeLeft = (MemPool.TimeoutRequestsWindowTime / 1000) - timeElapse;
-        requestObject.validationWindow = timeLeft;
+        return timeLeft;
     }
 
     // Remove the request from the mempool
     removeValidationRequest(walletAddress) {
         this.timeoutRequests = this.timeoutRequests.filter(r => r.walletAddress !== walletAddress);
-        console.log(`Removing request with address: ${walletAddress}`);
-
     }
-
+    // Returns true if the wallet address has submitted a request before
     isRequestInPool(walletAddress) {
         if (!!this.timeoutRequests[walletAddress]) {
             return true;
@@ -57,15 +62,42 @@ class MemPool {
         return false;
     }
 
+    // Return the exiting request from the temporal mempool
     getExistingRequest(request) {
-        if (this.isRequestInPool()) {
+        if (this.isRequestInPool(request.walletAddress)) {
             return this.memPool[request.walletAddress];
         }
         return null;
     }
 
+    validateRequestByWallet(walletAddress, signature) {
+        const request = this.getExistingRequest({ walletAddress: walletAddress });
+        if (!request) {
+            return false;
+        }
+        let isValid = bitcoinMessage.verify(request.message, walletAddress, signature);
+        return isValid;
+    }
+
+    addRequestToValidMempool(walletAddress) {
+        const request = this.getExistingRequest({ walletAddress: walletAddress });
+        if (!request) {
+            return false;
+        }
+        const { requestTimeStamp, message } = request;
+        const validationWindow = this.getValidationWindow(request);
+        const newReq = new RequestObjectValidated(walletAddress, requestTimeStamp, message, validationWindow);
+        this.removeValidationRequest(walletAddress); // Removes the request from temporal memPool
+        this.mempoolValid[walletAddress] = newReq; // Adds the new valid request to mempoolValid
+        return newReq;
+    }
+
+
+
+
+
 
 }
 
-MemPool.TimeoutRequestsWindowTime = 5*60*1000;
+MemPool.TimeoutRequestsWindowTime = 5 * 60 * 1000;
 module.exports = MemPool;

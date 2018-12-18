@@ -123,8 +123,12 @@ class MemPool {
         return newReq;
     }
 
+    encodeStory(body) {
+
+    }
+
 }
 
-MemPool.TimeoutRequestsWindowTime = 5 * 60 * 1000;
-MemPool.TimeoutValidRequestsWindowTime = 30 * 60 * 1000;
+MemPool.TimeoutRequestsWindowTime = 5 * 60 * 1000; // 5 min
+MemPool.TimeoutValidRequestsWindowTime = 30 * 60 * 1000; // 30 min
 module.exports = MemPool;

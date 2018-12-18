@@ -4,6 +4,7 @@
 
 const Star = require('../entities/Star');
 const MemPool = require('../db/memPool');
+const Block = require('../entities/Block');
 //Services
 const BlockService = require('../services/BlockService');
 
@@ -87,7 +88,7 @@ class ValidationController {
                     // Create new Star object
                     const newStar = new Star(star);
                     // Add block
-                    const newBlock = await this.blockService.addNewBlock(newStar);
+                    const newBlock = await this.blockService.addNewBlock(new Block(newStar));
                     // Return block
                     res.send(newBlock);
                 }

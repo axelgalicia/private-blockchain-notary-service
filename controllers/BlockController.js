@@ -5,6 +5,7 @@ const ResponseError = require('../entities/ResponseError');
 const ErrorType = require('../entities/ErrorType');
 //Services
 const BlockService = require('../services/BlockService');
+const hex2ascii = require('hex2ascii');
 
 /**
  * Controller Definition to encapsulate routes to work with blocks
@@ -18,13 +19,13 @@ class BlockController {
     constructor(app) {
         this.app = app;
         this.blockService = new BlockService();
-        //  this.initializeMockData();
         this.getBlockByIndex();
+        this.getBlockByHash();
         this.postNewBlock();
     }
 
     /**
-     * GET Endpoint to retrieve a block by index, url: "/api/block/:index"
+     * GET Endpoint to retrieve a block by index, url: "/block/:index"
      */
     getBlockByIndex() {
         this.app.get("/block/:index", async (req, res) => {
@@ -43,6 +44,39 @@ class BlockController {
                 }
             });
             res.status(200).json(block);
+        });
+    }
+
+    /**
+    * GET Endpoint to retrieve a block by hash, url: "/stars/[hash:[hash]]"
+    */
+    getBlockByHash() {
+        this.app.get("/stars/:hash", async (req, res) => {
+            const { hash } = req.params;
+            const hashParameters = hash.split(':');
+            const hashParameter = hashParameters[0];
+            const hashValue = hashParameters[1];
+            if (hashParameter !== 'hash' || !hashValue) {
+                res.status(400).send('hash parameter is mandatory hash:[hash]');
+            } else {
+                let error = '';
+                const block = await this.blockService.getBlockByHash(hashValue).catch((e) => {
+                    console.log(e);
+                    error = new ResponseError('There was an error to retrieve block');
+                    ResponseError.printError(error);
+                    res.status(500).json(error);
+
+                });
+                if (block === -1) {
+                    error = new ResponseError(`The star with hash [${hashValue}] does not exist`, ErrorType.PARAMETER);
+                    ResponseError.printError(error);
+                    res.status(404).json(error);
+                } else {
+                    block.body.star.storyDecoded = hex2ascii(block.body.star.story);
+                    res.status(200).json(block);
+                }
+
+            }
         });
     }
 

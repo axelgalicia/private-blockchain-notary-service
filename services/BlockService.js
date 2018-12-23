@@ -22,11 +22,20 @@ class BlockService {
     async getBlockchain() {
         return await this.initBlockchain();
     }
+
     // Look up for the block by index
     async getBlockByIndex(index) {
         let block = {};
         let bc = await this.getBlockchain();
         block = await bc.getBlock(index);
+        return BlockChain.getBlockFromString(block);
+    }
+
+    // Look up for the block by block hash
+    async getBlockByHash(hash) {
+        let block = {};
+        let bc = await this.getBlockchain();
+        block = await bc.getBlockByHash(hash);
         return BlockChain.getBlockFromString(block);
     }
 

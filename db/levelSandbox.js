@@ -35,6 +35,29 @@ class Storage {
     });
   }
 
+  // Get data from levelDB with key
+  getBlockByHash(hash) {
+    let block = -1;
+    return new Promise((resolve, reject) => {
+      this.db.createReadStream().on('data', function (data) {
+        const blockParsed = JSON.parse(data.value);
+        if (blockParsed.hash === hash) {
+          block = data.value;
+        }
+      }).on('error', function (err) {
+        console.log('Unable to read data stream!', err);
+        reject(err);
+      }).on('close', function () {
+        if (block === -1) {
+          resolve(-1);
+        }
+        resolve(block);
+      });
+
+    });
+
+  }
+
   // Add data to levelDB with value
   addDataToLevelDB(value) {
     let i = -1;

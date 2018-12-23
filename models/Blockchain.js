@@ -100,6 +100,11 @@ class Blockchain {
     return storage.getLevelDBData(blockHeight);
   }
 
+  // get block by hash
+  getBlockByHash(blockHash) {
+    return storage.getBlockByHash(blockHash);
+  }
+
 
   // Validates block integrity
   validateBlockIntegrity(block) {

@@ -7,6 +7,7 @@ const MemPool = require('../db/memPool');
 const Block = require('../entities/Block');
 //Services
 const BlockService = require('../services/BlockService');
+const hex2ascii = require('hex2ascii');
 
 
 class ValidationController {
@@ -86,9 +87,11 @@ class ValidationController {
                     // Remove valid request from valid pool
                     this.memPool.removeValidationValidRequest(address);
                     // Create new Star object
-                    const newStar = new Star(star);
+                    const newStar = {star : new Star(star)};
                     // Add block
                     const newBlock = await this.blockService.addNewBlock(new Block(newStar));
+                    // Add decoded story
+                    newBlock.body.star.storyDecoded = hex2ascii(newBlock.body.star.story);
                     // Return block
                     res.send(newBlock);
                 }

@@ -73,7 +73,7 @@ class ValidationController {
     * POST Endpoint to register a new start
     */
     registerNewStar() {
-        this.app.post('/star', async (req, res) => {
+        this.app.post('/block', async (req, res) => {
             const { address, star } = req.body;
             if (!address || !star || !star.ra
                 || !star.dec || !star.story) {

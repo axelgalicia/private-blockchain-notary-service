@@ -54,7 +54,7 @@ class BlockService {
     async getBlockByQueryParameter(queryParameter, queryValue) {
         switch (queryParameter) {
             case 'hash': return await this.getBlockByHash(queryValue);
-            case 'walletaddress': return await this.getBlockByAddress(queryValue);
+            case 'address': return await this.getBlockByAddress(queryValue);
             case 'height': return await this.getBlockByIndex(queryValue).catch(() => { return -1 });
             default: return -1;
         }

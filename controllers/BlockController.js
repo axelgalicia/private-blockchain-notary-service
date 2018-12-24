@@ -19,15 +19,15 @@ class BlockController {
     constructor(app) {
         this.app = app;
         this.blockService = new BlockService();
-        this.getBlockByIndex();
-        this.getBlockByHash();
-        this.postNewBlock();
+       // this.getBlockByIndex();
+        this.getBlockByQuery();
+        //this.postNewBlock();
     }
 
     /**
-     * GET Endpoint to retrieve a block by index, url: "/block/:index"
+     * GET Endpoint to retrieve a block by index, url: "/block/:index"  FOR TESTING
      */
-    getBlockByIndex() {
+  /*  getBlockByIndex() {
         this.app.get("/block/:index", async (req, res) => {
             const { index } = req.params;
             const block = await this.blockService.getBlockByIndex(index).catch((e) => {
@@ -45,35 +45,43 @@ class BlockController {
             });
             res.status(200).json(block);
         });
-    }
+    } /*
 
     /**
     * GET Endpoint to retrieve a block by hash, url: "/stars/[hash:[hash]]"
     */
-    getBlockByHash() {
-        this.app.get("/stars/:hash", async (req, res) => {
-            const { hash } = req.params;
-            const hashParameters = hash.split(':');
-            const hashParameter = hashParameters[0];
-            const hashValue = hashParameters[1];
-            if (hashParameter !== 'hash' || !hashValue) {
-                res.status(400).send('hash parameter is mandatory hash:[hash]');
+    getBlockByQuery() {
+        this.app.get("/stars/:query", async (req, res) => {
+            const { query } = req.params;
+            const queryParameters = query.split(':');
+            const queryParameter = queryParameters[0];
+            const queryValue = queryParameters[1];
+            if (queryParameter !== 'hash' & queryParameter !== 'walletaddress' & queryParameter !== 'height' | !queryValue) {
+                res.status(400).send('query parameter is mandatory hash:[hash], walletaddress:[address], height:[height]');
             } else {
                 let error = '';
-                const block = await this.blockService.getBlockByHash(hashValue).catch((e) => {
+                const blocks = await this.blockService.getBlockByQueryParameter(queryParameter, queryValue).catch((e) => {
                     console.log(e);
                     error = new ResponseError('There was an error to retrieve block');
                     ResponseError.printError(error);
                     res.status(500).json(error);
 
                 });
-                if (block === -1) {
-                    error = new ResponseError(`The star with hash [${hashValue}] does not exist`, ErrorType.PARAMETER);
+                if (blocks === -1) {
+                    error = new ResponseError(`There are no stars with ${queryParameter} [${queryValue}]`, ErrorType.PARAMETER);
                     ResponseError.printError(error);
                     res.status(404).json(error);
                 } else {
-                    block.body.star.storyDecoded = hex2ascii(block.body.star.story);
-                    res.status(200).json(block);
+
+                    if (Array.isArray(blocks)) {
+                        blocks.map(block => {
+                            block.body.star.storyDecoded = hex2ascii(block.body.star.story);
+                        });
+                    } else {
+                        blocks.body.star.storyDecoded = hex2ascii(blocks.body.star.story);
+                    }
+
+                    res.status(200).json(blocks);
                 }
 
             }
@@ -81,9 +89,9 @@ class BlockController {
     }
 
     /**
-     * POST Endpoint to add a new Block, url: "/api/block"
+     * POST Endpoint to add a new Block, url: "/api/block"   FOR TESTING
      */
-    postNewBlock() {
+   /* postNewBlock() {
         this.app.post("/block", async (req, res) => {
             const { body } = req.body;
             if (!body) {
@@ -101,7 +109,7 @@ class BlockController {
             }
 
         });
-    }
+    } */
 
 }
 

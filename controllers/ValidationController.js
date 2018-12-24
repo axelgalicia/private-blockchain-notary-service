@@ -87,7 +87,7 @@ class ValidationController {
                     // Remove valid request from valid pool
                     this.memPool.removeValidationValidRequest(address);
                     // Create new Star object
-                    const newStar = {star : new Star(star)};
+                    const newStar = {address: address, star : new Star(star)};
                     // Add block
                     const newBlock = await this.blockService.addNewBlock(new Block(newStar));
                     // Add decoded story

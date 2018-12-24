@@ -28,7 +28,8 @@ class BlockService {
         let block = {};
         let bc = await this.getBlockchain();
         block = await bc.getBlock(index);
-        return BlockChain.getBlockFromString(block);
+        const blockObject = BlockChain.getBlockFromString(block);
+        return blockObject;
     }
 
     // Look up for the block by block hash
@@ -36,7 +37,27 @@ class BlockService {
         let block = {};
         let bc = await this.getBlockchain();
         block = await bc.getBlockByHash(hash);
-        return BlockChain.getBlockFromString(block);
+        const blockObject = BlockChain.getBlockFromString(block);
+        return blockObject;
+    }
+
+    // Look up for the block by wallet address
+    async getBlockByAddress(address) {
+        let blocks = [];
+        let bc = await this.getBlockchain();
+        blocks = await bc.getBlockByWalletAddress(address);
+        return blocks;
+    }
+
+
+    // Look up for the block by query parameter
+    async getBlockByQueryParameter(queryParameter, queryValue) {
+        switch (queryParameter) {
+            case 'hash': return await this.getBlockByHash(queryValue);
+            case 'walletaddress': return await this.getBlockByAddress(queryValue);
+            case 'height': return await this.getBlockByIndex(queryValue).catch(() => { return -1 });
+            default: return -1;
+        }
     }
 
     // Creates a new Block

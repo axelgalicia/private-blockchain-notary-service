@@ -5,7 +5,7 @@
 const SHA256 = require('crypto-js/sha256');
 const storage = new (require('../db/levelSandbox')).Storage('./privatechain');
 const Block = require('../entities/Block');
-const colors = require('colors');
+
 
 
 /* ===== Blockchain Class ==========================
@@ -103,6 +103,11 @@ class Blockchain {
   // get block by hash
   getBlockByHash(blockHash) {
     return storage.getBlockByHash(blockHash);
+  }
+
+   // get block by wallet address
+   getBlockByWalletAddress(address) {
+    return storage.getBlockByWalletAddress(address);
   }
 
 

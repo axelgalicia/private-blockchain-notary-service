@@ -20,9 +20,6 @@ class ValidationController {
         this.app = app;
         this.memPool = new MemPool();
         this.blockService = new BlockService();
-        this.requestValidation();
-        this.validationRequest();
-        this.registerNewStar();
     }
 
     /**

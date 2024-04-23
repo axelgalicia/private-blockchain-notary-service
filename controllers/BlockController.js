@@ -81,7 +81,7 @@ class BlockController {
                 } else {
 
                     if (Array.isArray(blocks)) {
-                        blocks.map(block => {
+                        blocks.forEach(block => {
                             block.body.star.storyDecoded = hex2ascii(block.body.star.story);
                         });
                     } else {

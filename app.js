@@ -52,7 +52,10 @@ class BlockAPI {
      */
 	initControllers() {
 		require("./controllers/BlockController.js")(this.app);
-		new ValidationController(this.app);
+		const ValidationControllerInstance = new ValidationController(this.app);
+		ValidationControllerInstance.requestValidation();
+        ValidationControllerInstance.validationRequest();
+        ValidationControllerInstance.registerNewStar();
 	}
 
     /**
